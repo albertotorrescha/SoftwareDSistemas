@@ -1,0 +1,9 @@
+@inicio
+	var Edad = 20
+	var Nombre = "Albertano"
+	si Edad >= 18 ->
+		! Nombre " eres mayor"
+	sino ->
+		! Nombre " eres menor"
+	fin
+@fin
