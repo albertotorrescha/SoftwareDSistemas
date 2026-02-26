@@ -1,7 +1,7 @@
 import java.io.FileReader;
 import java.util.ArrayList;
 
-public class CompiladorLexico {
+public class Compiler_Lexer {
 
     /* ==========================
        LISTA DOBLEMENTE ENLAZADA
