@@ -3,40 +3,37 @@ import java.util.ArrayList;
 
 public class Lexico {
 
-    /* ==========================
-       LISTA DOBLEMENTE ENLAZADA
-       ========================== */
-
+    // Nodo de la lista doblemente enlazada que almacena un caracter del archivo
     static class Nodo {
         char caracter;
         Nodo siguiente;
         Nodo anterior;
 
-        Nodo(char c){
-            caracter = c;
+        // Constructor que inicializa el nodo con un caracter
+        Nodo(char caracterRecibido){
+            caracter = caracterRecibido;
         }
     }
 
+    // Punteros principales de la lista
     static Nodo cabeza = null;
     static Nodo cola = null;
 
-    static void insertar(char c){
-        Nodo nuevo = new Nodo(c);
+    // Inserta un caracter al final de la lista doblemente enlazada
+    static void insertarCaracter(char caracter){
+        Nodo nuevoNodo = new Nodo(caracter);
 
         if(cabeza == null){
-            cabeza = nuevo;
-            cola = nuevo;
+            cabeza = nuevoNodo;
+            cola = nuevoNodo;
         }else{
-            cola.siguiente = nuevo;
-            nuevo.anterior = cola;
-            cola = nuevo;
+            cola.siguiente = nuevoNodo;
+            nuevoNodo.anterior = cola;
+            cola = nuevoNodo;
         }
     }
 
-    /* ==========================
-       TOKENS
-       ========================== */
-
+    // Enumeracion que define los tipos de token del lenguaje
     enum TipoToken{
         RESERVADA,
         IDENTIFICADOR,
@@ -50,25 +47,25 @@ public class Lexico {
         ERROR
     }
 
+    // Clase que representa un token con su lexema, tipo y linea
     static class Token{
         String lexema;
         TipoToken tipo;
         int linea;
 
-        Token(String l, TipoToken t, int ln){
-            lexema = l;
-            tipo = t;
-            linea = ln;
+        // Constructor que inicializa los atributos del token
+        Token(String lexemaRecibido, TipoToken tipoRecibido, int lineaRecibida){
+            lexema = lexemaRecibido;
+            tipo = tipoRecibido;
+            linea = lineaRecibida;
         }
     }
 
-    static ArrayList<Token> tokens = new ArrayList<>();
+    // Lista que almacena todos los tokens generados por el analizador
+    static ArrayList<Token> listaTokens = new ArrayList<>();
 
-    /* ==========================
-       PALABRAS RESERVADAS
-       ========================== */
-
-    static String[] reservadas = {
+    // Arreglo con todas las palabras reservadas del lenguaje
+    static String[] palabrasReservadas = {
         "@inicio","@fin","si","sino","sino_si",
         "fin","mientras","para","hacer",
         "verdadero","falso","retornar",
@@ -76,224 +73,241 @@ public class Lexico {
         "romper","continuar","nulo","tipo"
     };
 
-    static boolean esReservada(String lex){
-        for(String r : reservadas)
-            if(r.equals(lex))
+    // Verifica si un lexema pertenece al conjunto de palabras reservadas
+    static boolean esPalabraReservada(String lexema){
+        for(String reservada : palabrasReservadas)
+            if(reservada.equals(lexema))
                 return true;
         return false;
     }
 
-    /* ==========================
-       UTILIDADES
-       ========================== */
-
-    static boolean esLetra(char c){
-        return (c>='a'&&c<='z')||(c>='A'&&c<='Z');
+    // Determina si un caracter es letra
+    static boolean esLetra(char caracter){
+        return (caracter>='a'&&caracter<='z')||(caracter>='A'&&caracter<='Z');
     }
 
-    static boolean esDigito(char c){
-        return (c>='0'&&c<='9');
+    // Determina si un caracter es digito
+    static boolean esDigito(char caracter){
+        return (caracter>='0'&&caracter<='9');
     }
 
-    static boolean esEspacio(char c){
-        return c==' '||c=='\n'||c=='\t'||c=='\r';
+    // Determina si un caracter es espacio en blanco
+    static boolean esEspacio(char caracter){
+        return caracter==' '||caracter=='\n'||caracter=='\t'||caracter=='\r';
     }
 
-    /* ==========================
-       CARGAR ARCHIVO
-       ========================== */
+    // Lee el archivo y carga cada caracter en la lista enlazada
+    static void cargarArchivo(String nombreArchivo)throws Exception{
+        FileReader lectorArchivo = new FileReader(nombreArchivo);
+        int codigoCaracter;
 
-    static void cargarArchivo(String nombre)throws Exception{
-        FileReader fr = new FileReader(nombre);
-        int c;
+        while((codigoCaracter = lectorArchivo.read()) != -1)
+            insertarCaracter((char)codigoCaracter);
 
-        while((c=fr.read())!=-1)
-            insertar((char)c);
-
-        fr.close();
+        lectorArchivo.close();
     }
 
-    /* ==========================
-       ANALIZADOR LEXICO
-       ========================== */
-
+    // Recorre la lista enlazada y construye los tokens segun las reglas del lenguaje
     static void analizar(){
 
-        Nodo actual = cabeza;
-        int linea = 1;
+        Nodo nodoActual = cabeza;
+        int numeroLinea = 1;
 
-        while(actual != null){
+        while(nodoActual != null){
 
-            char c = actual.caracter;
+            char caracterActual = nodoActual.caracter;
 
-            if(c == '\n'){
-                linea++;
-                actual = actual.siguiente;
+            if(caracterActual == '\n'){
+                numeroLinea++;
+                nodoActual = nodoActual.siguiente;
                 continue;
             }
 
-            if(esEspacio(c)){
-                actual = actual.siguiente;
+            if(esEspacio(caracterActual)){
+                nodoActual = nodoActual.siguiente;
                 continue;
             }
 
-            /* =========================
-               CADENAS
-               ========================= */
-            if(c == '"'){
-                String lex = "\"";
-                actual = actual.siguiente;
+            // Reconocimiento de cadenas delimitadas por comillas
+            if(caracterActual == '"'){
+                String lexema = "\"";
+                nodoActual = nodoActual.siguiente;
 
-                while(actual != null && actual.caracter != '"'){
-                    lex += actual.caracter;
-                    actual = actual.siguiente;
+                while(nodoActual != null && nodoActual.caracter != '"'){
+                    lexema += nodoActual.caracter;
+                    nodoActual = nodoActual.siguiente;
                 }
 
-                if(actual != null){
-                    lex += "\"";
-                    actual = actual.siguiente;
-                    tokens.add(new Token(lex, TipoToken.CADENA, linea));
+                if(nodoActual != null){
+                    lexema += "\"";
+                    nodoActual = nodoActual.siguiente;
+                    listaTokens.add(new Token(lexema, TipoToken.CADENA, numeroLinea));
                 }else{
-                    tokens.add(new Token(lex, TipoToken.ERROR, linea));
+                    listaTokens.add(new Token(lexema, TipoToken.ERROR, numeroLinea));
                 }
                 continue;
             }
 
-            /* =========================
-               NUMEROS
-               -?[0-9]+(\.[0-9]+)?
-               ========================= */
-            if(c == '-' || esDigito(c)){
+            // Reconocimiento de numeros enteros y decimales con signo opcional
+            if(caracterActual == '-' || esDigito(caracterActual)){
 
-                Nodo temp = actual;
-                String lex = "";
+                Nodo nodoTemporal = nodoActual;
+                String lexema = "";
                 boolean esDecimal = false;
 
-                if(c == '-'){
-                    lex += c;
-                    temp = temp.siguiente;
+                if(caracterActual == '-'){
+                    lexema += caracterActual;
+                    nodoTemporal = nodoTemporal.siguiente;
 
-                    if(temp == null || !esDigito(temp.caracter)){
-                        tokens.add(new Token("-", TipoToken.OPERADOR, linea));
-                        actual = actual.siguiente;
+                    if(nodoTemporal == null || !esDigito(nodoTemporal.caracter)){
+                        listaTokens.add(new Token("-", TipoToken.OPERADOR, numeroLinea));
+                        nodoActual = nodoActual.siguiente;
                         continue;
                     }
                 }
 
-                while(temp != null && esDigito(temp.caracter)){
-                    lex += temp.caracter;
-                    temp = temp.siguiente;
+                while(nodoTemporal != null && esDigito(nodoTemporal.caracter)){
+                    lexema += nodoTemporal.caracter;
+                    nodoTemporal = nodoTemporal.siguiente;
                 }
 
-                if(temp != null && temp.caracter == '.'){
-                    Nodo afterDot = temp.siguiente;
+                if(nodoTemporal != null && nodoTemporal.caracter == '.'){
+                    Nodo nodoDespuesPunto = nodoTemporal.siguiente;
 
-                    if(afterDot != null && esDigito(afterDot.caracter)){
+                    if(nodoDespuesPunto != null && esDigito(nodoDespuesPunto.caracter)){
                         esDecimal = true;
-                        lex += ".";
-                        temp = afterDot;
+                        lexema += ".";
+                        nodoTemporal = nodoDespuesPunto;
 
-                        while(temp != null && esDigito(temp.caracter)){
-                            lex += temp.caracter;
-                            temp = temp.siguiente;
+                        while(nodoTemporal != null && esDigito(nodoTemporal.caracter)){
+                            lexema += nodoTemporal.caracter;
+                            nodoTemporal = nodoTemporal.siguiente;
                         }
                     }
                 }
 
                 if(esDecimal)
-                    tokens.add(new Token(lex, TipoToken.DECIMAL, linea));
+                    listaTokens.add(new Token(lexema, TipoToken.DECIMAL, numeroLinea));
                 else
-                    tokens.add(new Token(lex, TipoToken.ENTERO, linea));
+                    listaTokens.add(new Token(lexema, TipoToken.ENTERO, numeroLinea));
 
-                actual = temp;
+                nodoActual = nodoTemporal;
                 continue;
             }
 
-            /* =========================
-               IDENTIFICADORES
-               ========================= */
-            if(esLetra(c)){
+            // Reconocimiento de identificadores y palabras reservadas (incluye @inicio y @fin)
+            if(caracterActual == '@' || esLetra(caracterActual)){
 
-                String lex = "";
-                Nodo temp = actual;
+                String lexema = "";
+                Nodo nodoTemporal = nodoActual;
 
-                while(temp != null &&
-                      (esLetra(temp.caracter) || esDigito(temp.caracter))){
-                    lex += temp.caracter;
-                    temp = temp.siguiente;
+                if(caracterActual == '@'){
+                    lexema += "@";
+                    nodoTemporal = nodoTemporal.siguiente;
                 }
 
-                if(esReservada(lex))
-                    tokens.add(new Token(lex, TipoToken.RESERVADA, linea));
-                else
-                    tokens.add(new Token(lex, TipoToken.IDENTIFICADOR, linea));
+                while(nodoTemporal != null &&
+                      (esLetra(nodoTemporal.caracter) || 
+                       esDigito(nodoTemporal.caracter))){
+                    lexema += nodoTemporal.caracter;
+                    nodoTemporal = nodoTemporal.siguiente;
+                }
 
-                actual = temp;
+                if(esPalabraReservada(lexema))
+                    listaTokens.add(new Token(lexema, TipoToken.RESERVADA, numeroLinea));
+                else
+                    listaTokens.add(new Token(lexema, TipoToken.IDENTIFICADOR, numeroLinea));
+
+                nodoActual = nodoTemporal;
                 continue;
             }
 
-            /* =========================
-               OPERADORES COMPUESTOS
-               ========================= */
-            if(actual.siguiente != null){
+            // Reconocimiento de operadores compuestos
+            if(nodoActual.siguiente != null){
 
-                String dos = "" + c + actual.siguiente.caracter;
+                String operadorDoble = "" + caracterActual + nodoActual.siguiente.caracter;
 
-                if(dos.equals("==") ||
-                   dos.equals("!=") ||
-                   dos.equals(">=") ||
-                   dos.equals("<=") ||
-                   dos.equals("->") ||
-                   dos.equals("<-")){
+                if(operadorDoble.equals("==") ||
+                   operadorDoble.equals("!=") ||
+                   operadorDoble.equals(">=") ||
+                   operadorDoble.equals("<=") ||
+                   operadorDoble.equals("->") ||
+                   operadorDoble.equals("<-")){
 
-                    tokens.add(new Token(dos, TipoToken.OPERADOR, linea));
-                    actual = actual.siguiente.siguiente;
+                    listaTokens.add(new Token(operadorDoble, TipoToken.OPERADOR, numeroLinea));
+                    nodoActual = nodoActual.siguiente.siguiente;
                     continue;
                 }
             }
 
-            /* =========================
-               FUNCIONES PRINCIPALES
-               ========================= */
-            if(c == '!'){
-                tokens.add(new Token("!", TipoToken.IMPRIMIR, linea));
-                actual = actual.siguiente;
+            // Reconocimiento de funciones especiales representadas por simbolos
+            if(caracterActual == '!'){
+                listaTokens.add(new Token("!", TipoToken.IMPRIMIR, numeroLinea));
+                nodoActual = nodoActual.siguiente;
                 continue;
             }
 
-            if(c == '?'){
-                tokens.add(new Token("?", TipoToken.LEER, linea));
-                actual = actual.siguiente;
+            if(caracterActual == '?'){
+                listaTokens.add(new Token("?", TipoToken.LEER, numeroLinea));
+                nodoActual = nodoActual.siguiente;
                 continue;
             }
 
-            if(c == '#'){
-                tokens.add(new Token("#", TipoToken.LIMPIAR_PANTALLA, linea));
-                actual = actual.siguiente;
+            if(caracterActual == '#'){
+                listaTokens.add(new Token("#", TipoToken.LIMPIAR_PANTALLA, numeroLinea));
+                nodoActual = nodoActual.siguiente;
                 continue;
             }
 
-            /* =========================
-               OPERADORES SIMPLES
-               ========================= */
-            if("=+-*/><()@".indexOf(c) >= 0){
-                tokens.add(new Token("" + c, TipoToken.OPERADOR, linea));
-                actual = actual.siguiente;
+            // Reconocimiento de operadores simples
+            if("=+-*/><()".indexOf(caracterActual) >= 0){
+                listaTokens.add(new Token("" + caracterActual, TipoToken.OPERADOR, numeroLinea));
+                nodoActual = nodoActual.siguiente;
                 continue;
             }
 
-            /* =========================
-               ERROR LEXICO
-               ========================= */
-            tokens.add(new Token("" + c, TipoToken.ERROR, linea));
-            actual = actual.siguiente;
+            // Cualquier caracter no reconocido se clasifica como error lexico
+            listaTokens.add(new Token("" + caracterActual, TipoToken.ERROR, numeroLinea));
+            nodoActual = nodoActual.siguiente;
         }
     }
 
-    /* ==========================
-       MOSTRAR TOKENS
-       ========================== */
+    // Muestra el codigo fuente numerado linea por linea
+    static void mostrarArchivoNumerado(String nombreArchivo){
 
+        try{
+            FileReader lector = new FileReader(nombreArchivo);
+            String linea = "";
+            int numeroLinea = 1;
+            int caracter;
+
+            System.out.println("\n=========== CODIGO FUENTE ===========\n");
+
+            while((caracter = lector.read()) != -1){
+
+                if(caracter == '\n'){
+                    System.out.printf("%-4d | %s\n", numeroLinea, linea);
+                    linea = "";
+                    numeroLinea++;
+                }else{
+                    linea += (char)caracter;
+                }
+            }
+
+            if(!linea.isEmpty()){
+                System.out.printf("%-4d | %s\n", numeroLinea, linea);
+            }
+
+            System.out.println("\n======================================\n");
+
+            lector.close();
+
+        }catch(Exception e){
+            System.out.println("Error al mostrar archivo: " + e.getMessage());
+        }
+    }
+
+    // Imprime en formato tabular todos los tokens generados
     static void mostrarTokens(){
 
         System.out.println("\n================ TABLA DE TOKENS ================");
@@ -301,33 +315,32 @@ public class Lexico {
                         "No.", "LEXEMA", "TIPO", "LINEA");
         System.out.println("------------------------------------------------------------");
 
-        for(int i = 0; i < tokens.size(); i++){
+        for(int indice = 0; indice < listaTokens.size(); indice++){
 
-            Token t = tokens.get(i);
+            Token tokenActual = listaTokens.get(indice);
 
             System.out.printf("%-5d %-20s %-20s %-10d\n",
-                    (i+1),
-                    t.lexema,
-                    t.tipo,
-                    t.linea);
+                    (indice+1),
+                    tokenActual.lexema,
+                    tokenActual.tipo,
+                    tokenActual.linea);
         }
 
         System.out.println("============================================================");
     }
 
-    /* ==========================
-       MAIN
-       ========================== */
-
+    // Metodo principal que ejecuta las fases del analizador lexico
     public static void main(String[] args){
 
         try{
-            cargarArchivo("C:\\Users\\chapa\\Documents\\codigo.txt");
+            String ruta = "C:\\Users\\chapa\\Documents\\codigo.txt";
+            mostrarArchivoNumerado(ruta);
+            cargarArchivo(ruta);
             analizar();
             mostrarTokens();
         }
-        catch(Exception e){
-            System.out.println("Error: "+e.getMessage());
+        catch(Exception excepcion){
+            System.out.println("Error: "+excepcion.getMessage());
         }
     }
 }
