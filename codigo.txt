@@ -1,0 +1,7 @@
+@inicio
+Escribir("Analisis Sintactico")
+var msj = "Hola Mundo"
+Escribir(msj)
+
+var suma = a + 10
+@fin
