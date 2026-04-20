@@ -1,7 +1,59 @@
 @inicio
-Escribir("Analisis Sintactico")
-var msj = "Hola Mundo"
-Escribir(msj)
 
-var suma = a + 10
+    #
+
+    var nombre = "Invitado"
+    var edad = 0
+    var promedio = 0.0
+    const MAX = 100
+
+    ! "=== Bienvenido al sistema ==="
+
+    ? nombre
+    ? edad
+
+    si edad >= 18
+        ! "Eres mayor de edad"
+        ! nombre
+    sino_si edad >= 13
+        ! "Eres adolescente"
+    sino
+        ! "Eres menor de edad"
+    fin
+
+    var suma = 0
+    var i = 1
+
+    mientras i <= 5
+        suma = suma + i
+        ! i
+        i = i + 1
+    fin
+
+    ! "La suma es:"
+    ! suma
+
+    para var j = 1 hacer j <= MAX
+        ! j
+        si j == 50
+            romper
+        fin
+    fin
+
+    var resultado = suma * 2
+    var decimal = 3.14 * resultado
+
+    ! "Resultado:"
+    ! resultado
+    ! "Decimal:"
+    ! decimal
+
+    funcion saludar(persona)
+        ! "Hola"
+        ! persona
+        retornar nulo
+    fin
+
+    saludar(nombre)
+
 @fin
