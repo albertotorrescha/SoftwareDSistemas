@@ -150,7 +150,6 @@ public class AnalizadorLexico {
     }
 
     private Nodo automataIdentificador(Nodo inicio, int linea){
-
         String lexema = "";
         Nodo temp = inicio;
 
@@ -160,7 +159,7 @@ public class AnalizadorLexico {
         }
 
         while(temp != null &&
-              (esLetra(temp.caracter) || esDigito(temp.caracter))){
+              (esLetra(temp.caracter) || esDigito(temp.caracter) || temp.caracter == '_')){
             lexema += temp.caracter;
             temp = temp.siguiente;
         }
