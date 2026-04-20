@@ -89,10 +89,6 @@ public class AnalizadorSintactico {
                lex.equals("sino")    || lex.equals("sino_si");
     }
 
-    // =========================================================
-    //  PUNTO DE ENTRADA
-    // =========================================================
-
     /**
      * Inicia el análisis sintáctico.
      * @return Lista de nodos AST que forman el programa.

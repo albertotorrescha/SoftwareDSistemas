@@ -15,7 +15,6 @@ import java.util.List;
  *       instrucciones
  *   fin
  *
- * Equivalente a ExpSi del código C del profesor.
  */
 public class NodoSi extends NodoAST {
     private NodoAST condicion;

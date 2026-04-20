@@ -11,13 +11,13 @@ public class Main {
     public static void main(String[] args) {
 
         try {
-            // ── FASE 1: Análisis Léxico ──────────────────────────
+            //Análisis Léxico ──────────────────────────
             AnalizadorLexico lexico = new AnalizadorLexico();
             lexico.cargarArchivo("codigo.txt");
             lexico.analizar();
             lexico.mostrarTokens();
 
-            // ── FASE 2: Análisis Sintáctico ──────────────────────
+            //Análisis Sintáctico ──────────────────────
             AnalizadorSintactico sintactico =
                 new AnalizadorSintactico(lexico.getTokens());
 

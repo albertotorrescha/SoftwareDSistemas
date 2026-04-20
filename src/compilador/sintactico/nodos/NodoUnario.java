@@ -3,7 +3,6 @@ package compilador.sintactico.nodos;
 /**
  * Nodo para operaciones unarias.
  * Ejemplo: -x  (negación aritmética)
- * Equivalente a ExpUna del código C del profesor.
  */
 public class NodoUnario extends NodoAST {
     private String operador;

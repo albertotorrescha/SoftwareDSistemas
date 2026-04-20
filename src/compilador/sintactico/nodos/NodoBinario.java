@@ -1,10 +1,5 @@
 package compilador.sintactico.nodos;
 
-/**
- * Nodo para operaciones binarias aritméticas y relacionales.
- * Ejemplo: a + b, x > 10, y == z
- * Equivalente a ExpBin del código C del profesor.
- */
 public class NodoBinario extends NodoAST {
     private String operador;
     private NodoAST izquierda;
